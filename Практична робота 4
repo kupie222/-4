@@ -1,0 +1,211 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SandPBlocks
+{
+    internal class Program
+    {
+        static string crypt(string enterNum)
+        {
+            Dictionary<string, string> firstT = new Dictionary<string, string>() // словник першої тетради
+            {
+                { "0000", "1100" },
+                { "0001", "1010" },
+                { "0010", "0111" },
+                { "0011", "0010" },
+                { "0100", "1001" },
+                { "0101", "0001" },
+                { "0110", "1110" },
+                { "0111", "0101" },
+                { "1000", "1011" }, 
+                { "1001", "0100" },
+                { "1010", "1111" },
+                { "1011", "0000" },
+                { "1100", "0110" },
+                { "1101", "1000" },
+                { "1110", "0011" },
+                { "1111", "1101" }
+            };
+            Dictionary<string, string> secondT = new Dictionary<string, string>()  // словник другої тетради
+            {
+                { "0000", "1011" },
+                { "0001", "0100" },
+                { "0010", "1111" },
+                { "0011", "0000" },
+                { "0100", "0110" },
+                { "0101", "1000" },
+                { "0110", "0011" },
+                { "0111", "1101" },
+                { "1000", "0010" },
+                { "1001", "1110" },
+                { "1010", "1001" },
+                { "1011", "0111" },
+                { "1100", "0101" },
+                { "1101", "1100" },
+                { "1110", "0001" },
+                { "1111", "1010" }
+            };
+            string fHalf = "", sHalf = ""; // змінні для розбиття бітів по 4
+            string cryptF = "", cryptS = "",cryptAllNum = "", cryptandchangedNum = "";
+            for(int i = 0; i < enterNum.Length; i++)// розбиття на 2 тетради
+            {
+                if (i < 4)
+                {
+                    fHalf += enterNum[i];
+                }
+                else 
+                {
+                    sHalf += enterNum[i];
+                }
+            }
+            foreach (var a in firstT) { // перебір кожного ключа значення словника якщо такий є присвоїти значення(перетворення за S-блоку)
+                if (a.Key == fHalf) { 
+                    cryptF = a.Value;
+                }
+            }
+            foreach (var a in secondT) {
+                if (a.Key == sHalf) { 
+                    cryptS = a.Value;
+                }
+            }
+            cryptAllNum = cryptF + cryptS;// з'єднуємо строки  
+            for (int i = 0; i < enterNum.Length; i +=2) {// перетворення за P-блоку
+                cryptandchangedNum += cryptAllNum[i + 1];
+                cryptandchangedNum += cryptAllNum[i];
+            }
+            return cryptandchangedNum;
+        }
+        static string decrypt(string textNum) {
+            Dictionary<string, string> firstT = new Dictionary<string, string>()
+            {
+                { "0000", "1100" },
+                { "0001", "1010" },
+                { "0010", "0111" },
+                { "0011", "0010" },
+                { "0100", "1001" },
+                { "0101", "0001" },
+                { "0110", "1110" },
+                { "0111", "0101" },
+                { "1000", "1011" },
+                { "1001", "0100" },
+                { "1010", "1111" },
+                { "1011", "0000" },
+                { "1100", "0110" },
+                { "1101", "1000" },
+                { "1110", "0011" },
+                { "1111", "1101" }
+            };
+            Dictionary<string, string> secondT = new Dictionary<string, string>() {
+                { "0000", "1011" },
+                { "0001", "0100" },
+                { "0010", "1111" },
+                { "0011", "0000" },
+                { "0100", "0110" },
+                { "0101", "1000" },
+                { "0110", "0011" },
+                { "0111", "1101" },
+                { "1000", "0010" },
+                { "1001", "1110" },
+                { "1010", "1001" },
+                { "1011", "0111" },
+                { "1100", "0101" },
+                { "1101", "1100" },
+                { "1110", "0001" },
+                { "1111", "1010" }
+            };
+            string fHalf = "", sHalf = "";
+            string cryptF = "", cryptS = "", cryptAllNum = "", cryptandchangedNum ="";
+            for (int i = 0; i < textNum.Length; i += 2)
+            {
+                cryptandchangedNum += textNum[i + 1];
+                cryptandchangedNum += textNum[i];
+            }
+            for (int i = 0; i < textNum.Length; i++)
+            {
+                if (i < 4)
+                {
+                    fHalf += cryptandchangedNum[i];
+                }
+                else
+                {
+                    sHalf += cryptandchangedNum[i];
+                }
+            }
+            foreach (var a in firstT)// перебір кожного ключа значення словника якщо такий є присвоїти ключ(перетворення за S-блоку)
+            {
+                if (a.Value == fHalf)
+                {
+                    cryptF = a.Key;
+                }
+            }
+            foreach (var a in secondT)
+            {
+                if (a.Value == sHalf)
+                {
+                    cryptS = a.Key;
+                }
+            }
+            cryptAllNum = cryptF + cryptS;
+            return cryptAllNum;
+        }
+        static string writeNum() {
+            bool ok = false; 
+            while (true)
+            {
+                Console.WriteLine("Write your numer");
+                string number = Console.ReadLine();
+                if (number.Length == 8) //перевірка на те чи довжинна введеного рядка має вісім символів
+                {
+                    foreach (char a in number) // беремо кожен символ зі строки
+                    {
+                        if (a == '0' || a == '1') { ok = true; } // перевірка на те чи всі символи будуть дорівнювати 0 або 1 в іншому випадку попросити ввести знову
+                        else
+                        {
+                            Console.WriteLine("only 1 or 0");
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (ok == true)
+                    {
+                        return number;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("write 8 numbers");
+                }
+            }
+        }
+        static void Main(string[] args)
+        {
+            //Меню для шифрування та дешифрування 
+            string choose; 
+            bool con = true;
+            string num;
+            while (con) {
+                Console.WriteLine("Choose 1. crypt 2. decrypt 3. quit");
+                choose = Console.ReadLine();
+                switch (choose) {
+                    case "1":
+                        num = writeNum();
+                        Console.WriteLine(crypt(num));
+                        break;
+                    case "2":
+                        num = writeNum();
+                        Console.WriteLine(decrypt(num));
+                        break;
+                    case "3":
+                        con = false;
+                        break;
+                    default:
+                       break;
+                }
+
+            }
+        }
+    }
+}
